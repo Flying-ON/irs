@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>International Raisin Society</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #0c1b34;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .irs-ruling {
+            max-width: 760px;
+            width: 100%;
+            margin: 80px auto;
+            padding: 0 20px;
+            color: white;
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        .irs-ruling h2 {
+            font-size: 58px;
+            font-weight: 300;
+            margin-bottom: 18px;
+        }
+
+        .irs-intro {
+            font-size: 24px;
+            line-height: 1.7;
+            max-width: 650px;
+            margin-bottom: 45px;
+        }
+
+        .irs-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .irs-form input {
+            flex: 1;
+            min-width: 260px;
+            padding: 18px 24px;
+            font-size: 22px;
+            background: white;
+            color: #0c1b34;
+            border: none;
+            font-family: inherit;
+        }
+
+        .irs-form input:focus {
+            outline: none;
+        }
+
+        .irs-form button {
+            background: white;
+            color: #0c1b34;
+            border: none;
+            padding: 18px 34px;
+            cursor: pointer;
+            font-size: 20px;
+            font-family: inherit;
+            transition: 0.25s;
+        }
+
+        .irs-form button:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .irs-result {
+            margin-top: 55px;
+            border: 2px solid rgba(255,255,255,.5);
+            padding: 35px;
+            transition: .3s;
+        }
+
+        .irs-label {
+            letter-spacing: 4px;
+            font-size: 13px;
+            opacity: .65;
+            margin-bottom: 18px;
+        }
+
+        .irs-text {
+            font-size: 34px;
+            line-height: 1.5;
+            transition: opacity .25s;
+        }
+
+        .irs-text strong {
+            display: block;
+            margin-top: 12px;
+            font-size: 48px;
+            letter-spacing: 2px;
+        }
+
+        .irs-result.controversial {
+            border-color: #d84a4a;
+        }
+
+        .irs-result.sometimes {
+            border-color: #d2bb5b;
+        }
+
+        .irs-result.not {
+            border-color: #82c889;
+        }
+
+        @media (max-width: 700px) {
+            .irs-ruling h2 {
+                font-size: 42px;
+            }
+
+            .irs-intro {
+                font-size: 20px;
+            }
+
+            .irs-text {
+                font-size: 26px;
+            }
+
+            .irs-text strong {
+                font-size: 36px;
+            }
+
+            .irs-form {
+                flex-direction: column;
+            }
+
+            .irs-form button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="irs-ruling">
+
+        <h2>Request an Official IRS Ruling</h2>
+
+        <p class="irs-intro">
+            Submit the name of a single food to determine its official controversy
+            classification according to the International Raisin Society.
+        </p>
+
+        <div class="irs-form">
+            <input
+                id="foodInput"
+                type="text"
+                placeholder="Enter a food..."
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false">
+
+            <button onclick="checkFood()">Submit for Review</button>
+        </div>
+
+        <div id="resultCard" class="irs-result">
+            <div class="irs-label">IRS RULING</div>
+            <div id="resultText" class="irs-text">
+                Awaiting submission.
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const foods = new Set([
+            "pizza",
+            "burger",
+            "hamburger",
+            "cheeseburger",
+            "hotdog",
+            "sandwich",
+            "sub",
+            "wrap",
+            "panini"
+        ]);
+
+        function setResult(message, type) {
+            const card = document.getElementById("resultCard");
+            const text = document.getElementById("resultText");
+
+            card.className = "irs-result " + type;
+
+            text.style.opacity = 0;
+
+            setTimeout(() => {
+                text.innerHTML = message;
+                text.style.opacity = 1;
+            }, 150);
+        }
+
+        function checkFood() {
+            const raw = document.getElementById("foodInput").value.trim();
+
+            if (raw === "" || /\s/.test(raw)) {
+                setResult(
+                    "Please submit the name of a <strong>single food</strong> for official review.",
+                    "neutral"
+                );
+                return;
+            }
+
+            const input = raw
+                .toLowerCase()
+                .replace(/[^a-z]/g, "");
+
+            if (!foods.has(input)) {
+                setResult(
+                    "The IRS cannot issue a ruling because this item is not recognized as a food.",
+                    "neutral"
+                );
+                return;
+            }
+
+            if (/(.)\1/.test(input)) {
+                setResult(
+                    "The International Raisin Society has determined that this food is<br><br><strong>SOMETIMES CONTROVERSIAL</strong>.",
+                    "sometimes"
+                );
+                return;
+            }
+
+            if (/(.).\1/.test(input)) {
+                setResult(
+                    "The International Raisin Society has determined that this food is<br><br><strong>CONTROVERSIAL</strong>.",
+                    "controversial"
+                );
+                return;
+            }
+
+            setResult(
+                "The International Raisin Society has determined that this food is<br><br><strong>NOT CONTROVERSIAL</strong>.",
+                "not"
+            );
+        }
+
+        document.getElementById("foodInput").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                checkFood();
+            }
+        });
+    </script>
+
+</body>
+</html>
