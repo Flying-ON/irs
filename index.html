@@ -223,8 +223,7 @@
   "naan",
   "dal",
   "vindaloo",
-"raisin",
-"sultana",
+  "sultana",
 
   "chili",
   "stew",
@@ -1072,7 +1071,13 @@
             const input = raw
                 .toLowerCase()
                 .replace(/[^a-z]/g, "");
-
+            if (input.includes("raisin")) {
+                setResult(
+                    "The IRS is still in the process of evaluating the controversy of this food...",
+                    "neutral"
+                );
+                return;
+                
             if (!foods.has(input)) {
                 setResult(
                     "The IRS cannot issue a ruling because this item is not recognized as a food.",
